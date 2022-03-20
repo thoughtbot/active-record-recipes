@@ -37,4 +37,14 @@ class RecipeTest < ActiveSupport::TestCase
 
     assert_equal ["First Recipe For Chef One", "First Recipe For Chef Two"], Recipe.first_per_chef.map(&:name)
   end
+
+  test ".per_chef" do
+    chef_one = Chef.create!(id: 1)
+    chef_two = Chef.create!(id: 2)
+    chef_one.recipes.create!
+    chef_one.recipes.create!
+    chef_two.recipes.create!
+
+    assert_equal({1 => 2, 2 => 1}, Recipe.per_chef)
+  end
 end
