@@ -15,4 +15,8 @@ class Recipe < ApplicationRecord
   scope :per_chef, -> {
     group(:chef_id).count
   }
+
+  scope :with_description, ->(string = "") {
+    joins(:rich_text_description).where("body LIKE ?", "%#{string}%")
+  }
 end
