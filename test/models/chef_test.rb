@@ -18,4 +18,20 @@ class ChefTest < ActiveSupport::TestCase
       chef.destroy!
     end
   end
+
+  test ".first_recipe" do
+    chef = Chef.create!
+    chef.recipes.create!(name: "Latest Recipe", created_at: 1.day.ago)
+    chef.recipes.create!(name: "First Recipe", created_at: 1.week.ago)
+
+    assert_equal "First Recipe", chef.first_recipe.name
+  end
+
+  test ".latest_recipe" do
+    chef = Chef.create!
+    chef.recipes.create!(name: "Latest Recipe", created_at: 1.day.ago)
+    chef.recipes.create!(name: "First Recipe", created_at: 1.week.ago)
+
+    assert_equal "Latest Recipe", chef.latest_recipe.name
+  end
 end
