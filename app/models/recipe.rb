@@ -1,5 +1,8 @@
 class Recipe < ApplicationRecord
   belongs_to :chef
+  has_many :steps
+  accepts_nested_attributes_for :steps
+
   has_rich_text :description
 
   scope :first_per_chef, -> {
@@ -18,5 +21,13 @@ class Recipe < ApplicationRecord
 
   scope :with_description, ->(string = "") {
     joins(:rich_text_description).where("body LIKE ?", "%#{string}%")
+  }
+
+  scope :by_duration, -> {
+    joins(:steps).group(:id).sum(:duration)
+  }
+
+  scope :quick, -> {
+    joins(:steps).group(:id).having("SUM(duration) <= ?", 15.minutes.iso8601)
   }
 end

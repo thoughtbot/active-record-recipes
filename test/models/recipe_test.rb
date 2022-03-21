@@ -58,4 +58,71 @@ class RecipeTest < ActiveSupport::TestCase
     assert_equal [1, 2], Recipe.with_description("he").map(&:id)
     assert_equal [2], Recipe.with_description("hello").map(&:id)
   end
+
+  test ".by_duration" do
+    chef = Chef.create!
+    chef.recipes.create!(
+      name: "Recipe 1",
+      steps_attributes: [
+        {
+          description: "Step 1",
+          duration: 10.minutes
+        },
+        {
+          description: "Step 2",
+          duration: 15.minutes
+        }
+      ]
+    )
+    chef.recipes.create!(
+      name: "Recipe 1",
+      steps_attributes: [
+        {
+          description: "Step 1"
+        },
+        {
+          description: "Step 2",
+          duration: 5.minutes
+        }
+      ]
+    )
+
+    assert_equal [300, 1500], Recipe.by_duration.values.map(&:to_i).sort
+  end
+
+  test ".quick" do
+    chef = Chef.create!
+    chef.recipes.create!(
+      name: "Quick",
+      steps_attributes: [
+        {
+          description: "Step 1",
+          duration: 10.minutes
+        },
+        {
+          description: "Step 2",
+          duration: 5.minutes
+        }
+      ]
+    )
+    chef.recipes.create!(
+      name: "Not Quick",
+      steps_attributes: [
+        {
+          description: "Step 1",
+          duration: 10.minutes
+        },
+        {
+          description: "Step 2",
+          duration: 5.minutes
+        },
+        {
+          description: "Step 3",
+          duration: 1.minutes
+        }
+      ]
+    )
+
+    assert_equal ["Quick"], Recipe.quick.map(&:name)
+  end
 end
