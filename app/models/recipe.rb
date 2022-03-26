@@ -1,9 +1,13 @@
 class Recipe < ApplicationRecord
   belongs_to :chef
   has_many :steps
+  has_many :measurements, dependent: :destroy
+  has_many :ingredients, through: :measurements
   accepts_nested_attributes_for :steps
 
   has_rich_text :description
+
+  validates :servings, presence: true
 
   scope :first_per_chef, -> {
     select("DISTINCT ON(recipes.chef_id) recipes.*")
@@ -29,5 +33,19 @@ class Recipe < ApplicationRecord
 
   scope :quick, -> {
     joins(:steps).group(:id).having("SUM(duration) <= ?", 15.minutes.iso8601)
+  }
+
+  scope :unhealthy, -> {
+    joins(:ingredients)
+      .where({ingredients: {name: "sugar"}})
+      .group(:id)
+      .having("(SUM(grams) / recipes.servings) >= ?", 20.00)
+  }
+
+  scope :with_ingredients, ->(ingredients) {
+    joins(:ingredients)
+      .where({ingredients: {name: ingredients}})
+      .order(:name)
+      .distinct
   }
 end

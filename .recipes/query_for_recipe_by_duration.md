@@ -1,4 +1,4 @@
-## Query for Recipe by Duration
+# Query for Recipe by Duration
 
 ```ruby
 # app/models/recipe.rb

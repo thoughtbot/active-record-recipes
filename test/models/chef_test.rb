@@ -11,7 +11,7 @@ class ChefTest < ActiveSupport::TestCase
     chef = Chef.create!
 
     assert_difference("chef.recipes.count", 1) do
-      chef.recipes.create!
+      chef.recipes.create!(servings: 1)
     end
 
     assert_difference("chef.recipes.count", -1) do
@@ -19,19 +19,52 @@ class ChefTest < ActiveSupport::TestCase
     end
   end
 
+  test "#unhealthy_recipes" do
+    chef_one = Chef.create!(name: "Unhealthy")
+    chef_two = Chef.create!(name: "Healthy")
+    sugar = Ingredient.create!(name: "Sugar")
+    egg = Ingredient.create!(name: "Egg")
+    recipe_one = chef_one.recipes.create!(name: "Unhealthy Recipe", servings: 2)
+    recipe_two = chef_two.recipes.create!(name: "Healthy Recipe", servings: 1)
+    recipe_three = chef_one.recipes.create!(name: "Slightly Unhealthy Recipe", servings: 1)
+    recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
+    recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
+    recipe_two.measurements.create!(ingredient: egg)
+    recipe_three.measurements.create!(ingredient: sugar, grams: 10.00)
+
+    assert_equal ["Unhealthy Recipe"], chef_one.unhealthy_recipes.map(&:name)
+    assert_empty chef_two.unhealthy_recipes.map(&:name)
+  end
+
   test ".first_recipe" do
     chef = Chef.create!
-    chef.recipes.create!(name: "Latest Recipe", created_at: 1.day.ago)
-    chef.recipes.create!(name: "First Recipe", created_at: 1.week.ago)
+    chef.recipes.create!(name: "Latest Recipe", servings: 1, created_at: 1.day.ago)
+    chef.recipes.create!(name: "First Recipe", servings: 1, created_at: 1.week.ago)
 
     assert_equal "First Recipe", chef.first_recipe.name
   end
 
   test ".latest_recipe" do
     chef = Chef.create!
-    chef.recipes.create!(name: "Latest Recipe", created_at: 1.day.ago)
-    chef.recipes.create!(name: "First Recipe", created_at: 1.week.ago)
+    chef.recipes.create!(name: "Latest Recipe", servings: 1, created_at: 1.day.ago)
+    chef.recipes.create!(name: "First Recipe", servings: 1, created_at: 1.week.ago)
 
     assert_equal "Latest Recipe", chef.latest_recipe.name
+  end
+
+  test ".with_unhealthy_recipes" do
+    chef_one = Chef.create!(name: "Unhealthy")
+    chef_two = Chef.create!(name: "Healthy")
+    sugar = Ingredient.create!(name: "Sugar")
+    egg = Ingredient.create!(name: "Egg")
+    recipe_one = chef_one.recipes.create!(name: "Unhealthy Recipe", servings: 2)
+    recipe_two = chef_two.recipes.create!(name: "Healthy Recipe", servings: 1)
+    recipe_three = chef_one.recipes.create!(name: "Slightly Unhealthy Recipe", servings: 1)
+    recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
+    recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
+    recipe_two.measurements.create!(ingredient: egg)
+    recipe_three.measurements.create!(ingredient: sugar, grams: 10.00)
+
+    assert_equal ["Unhealthy"], Chef.with_unhealthy_recipes.map(&:name)
   end
 end
