@@ -23,13 +23,6 @@ class Recipe < ApplicationRecord
     joins(:rich_text_description).where("body LIKE ?", "%#{string}%")
   }
 
-  scope :by_duration, -> {
-    joins(:steps)
-      .group(:name)
-      .order("SUM(steps.duration) ASC")
-      .sum(:duration)
-  }
-
   scope :quick, -> {
     joins(:steps).group(:id).having("SUM(duration) <= ?", 15.minutes.iso8601)
   }
@@ -47,6 +40,13 @@ class Recipe < ApplicationRecord
       .order(:name)
       .distinct
   }
+
+  def self.by_duration
+    joins(:steps)
+      .group(:name)
+      .order("SUM(steps.duration) ASC")
+      .sum(:duration)
+  end
 
   def self.per_chef
     Chef
