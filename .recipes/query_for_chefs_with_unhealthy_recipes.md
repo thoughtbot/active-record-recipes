@@ -25,7 +25,10 @@ class Chef < ApplicationRecord
   has_many :unhealthy_recipes, -> { unhealthy }, class_name: "Recipe"
 
   scope :with_unhealthy_recipes, -> {
-    joins(:unhealthy_recipes).distinct
+    joins(:recipes)
+      .where(recipes: Recipe.unhealthy)
+      .order(:name)
+      .distinct
   }
 end
 ```
