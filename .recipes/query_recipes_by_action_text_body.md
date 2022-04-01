@@ -10,3 +10,8 @@ class Recipe < ApplicationRecord
   }
 end
 ```
+
+```ruby
+Recipe.with_description("hello")
+# => [#<Recipe>, #<Recipe>]
+```
