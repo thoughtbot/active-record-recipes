@@ -28,7 +28,10 @@ class Recipe < ApplicationRecord
   }
 
   scope :by_duration, -> {
-    joins(:steps).group(:id).sum(:duration)
+    joins(:steps)
+      .group(:name)
+      .order("SUM(steps.duration) ASC")
+      .sum(:duration)
   }
 
   scope :quick, -> {

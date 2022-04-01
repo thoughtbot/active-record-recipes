@@ -85,7 +85,7 @@ class RecipeTest < ActiveSupport::TestCase
   test ".by_duration" do
     chef = Chef.create!
     chef.recipes.create!(
-      name: "Recipe 1",
+      name: "Recipe One",
       servings: 1,
       steps_attributes: [
         {
@@ -99,7 +99,7 @@ class RecipeTest < ActiveSupport::TestCase
       ]
     )
     chef.recipes.create!(
-      name: "Recipe 1",
+      name: "Recipe Two",
       servings: 1,
       steps_attributes: [
         {
@@ -112,7 +112,7 @@ class RecipeTest < ActiveSupport::TestCase
       ]
     )
 
-    assert_equal [300, 1500], Recipe.by_duration.values.map(&:to_i).sort
+    assert_equal({"Recipe Two" => 300, "Recipe One" => 1500}, Recipe.by_duration)
   end
 
   test ".quick" do
