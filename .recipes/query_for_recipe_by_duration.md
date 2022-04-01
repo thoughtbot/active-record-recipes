@@ -5,16 +5,16 @@
 class Recipe < ApplicationRecord
   has_many :steps
 
-  scope :by_duration, -> {
+  scope :quick, -> {
+    joins(:steps).group(:id).having("SUM(duration) <= ?", 15.minutes.iso8601)
+  }
+
+  def self.by_duration
     joins(:steps)
       .group(:name)
       .order("SUM(steps.duration) ASC")
       .sum(:duration)
-  }
-
-  scope :quick, -> {
-    joins(:steps).group(:id).having("SUM(duration) <= ?", 15.minutes.iso8601)
-  }
+  end  
 end
 ```
 
