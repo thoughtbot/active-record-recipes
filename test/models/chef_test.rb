@@ -36,6 +36,44 @@ class ChefTest < ActiveSupport::TestCase
     assert_empty chef_two.unhealthy_recipes.map(&:name)
   end
 
+  test "#quick_recipes" do
+    chef = Chef.create!
+    chef.recipes.create!(
+      name: "Quick",
+      servings: 1,
+      steps_attributes: [
+        {
+          description: "Step 1",
+          duration: 10.minutes
+        },
+        {
+          description: "Step 2",
+          duration: 5.minutes
+        }
+      ]
+    )
+    chef.recipes.create!(
+      name: "Not Quick",
+      servings: 1,
+      steps_attributes: [
+        {
+          description: "Step 1",
+          duration: 10.minutes
+        },
+        {
+          description: "Step 2",
+          duration: 5.minutes
+        },
+        {
+          description: "Step 3",
+          duration: 1.minutes
+        }
+      ]
+    )
+
+    assert_equal ["Quick"], chef.quick_recipes.map(&:name)
+  end
+
   test ".first_recipe" do
     chef = Chef.create!
     chef.recipes.create!(name: "Latest Recipe", servings: 1, created_at: 1.day.ago)
@@ -66,5 +104,95 @@ class ChefTest < ActiveSupport::TestCase
     recipe_three.measurements.create!(ingredient: sugar, grams: 10.00)
 
     assert_equal ["Unhealthy"], Chef.with_unhealthy_recipes.map(&:name)
+  end
+
+  test ".with_quick_recipes" do
+    chef_one = Chef.create!(name: "Chef With Quick Recipes")
+    chef_two = Chef.create!(name: "Chef Without Quick Recipe")
+    chef_three = Chef.create!(name: "Another Chef With Quick Recipes")
+    chef_one.recipes.create!(
+      name: "Quick Recipe",
+      servings: 1,
+      steps_attributes: [
+        {
+          description: "Step 1",
+          duration: 10.minutes
+        },
+        {
+          description: "Step 2",
+          duration: 5.minutes
+        }
+      ]
+    )
+    chef_one.recipes.create!(
+      name: "Another Quick Recipe",
+      servings: 1,
+      steps_attributes: [
+        {
+          description: "Step 1",
+          duration: 10.minutes
+        },
+        {
+          description: "Step 2",
+          duration: 5.minutes
+        }
+      ]
+    )
+    chef_two.recipes.create!(
+      name: "Not Quick Recipe",
+      servings: 1,
+      steps_attributes: [
+        {
+          description: "Step 1",
+          duration: 10.minutes
+        },
+        {
+          description: "Step 2",
+          duration: 5.minutes
+        },
+        {
+          description: "Step 3",
+          duration: 1.minutes
+        }
+      ]
+    )
+    chef_three.recipes.create!(
+      name: "Not Quick Recipe",
+      servings: 1,
+      steps_attributes: [
+        {
+          description: "Step 1",
+          duration: 10.minutes
+        },
+        {
+          description: "Step 2",
+          duration: 5.minutes
+        },
+        {
+          description: "Step 3",
+          duration: 1.minutes
+        }
+      ]
+    )
+    chef_three.recipes.create!(
+      name: "A Quick Recipe",
+      servings: 1,
+      steps_attributes: [
+        {
+          description: "Step 1",
+          duration: 10.minutes
+        },
+        {
+          description: "Step 2",
+          duration: 4.minutes
+        },
+        {
+          description: "Step 3",
+          duration: 1.minutes
+        }
+      ]
+    )
+
+    assert_equal ["Another Chef With Quick Recipes", "Chef With Quick Recipes"], Chef.with_quick_recipes.map(&:name)
   end
 end
