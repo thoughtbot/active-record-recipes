@@ -19,4 +19,11 @@ class Chef < ApplicationRecord
       .order(:name)
       .distinct
   }
+
+  scope :with_recipes_with_ingredients, ->(ingredients) {
+    joins(recipes: :ingredients)
+      .where({ingredients: {name: ingredients}})
+      .distinct
+      .order(:name)
+  }
 end

@@ -1,4 +1,4 @@
-# Query for Chefs with Unhealthy Recipes
+# Query for Chefs by Recipe Ingredient
 
 ```ruby
 # app/models/recipe.rb
@@ -30,6 +30,13 @@ class Chef < ApplicationRecord
       .order(:name)
       .distinct
   }
+
+  scope :with_recipes_with_ingredients, ->(ingredients) {
+    joins(recipes: :ingredients)
+      .where({ingredients: {name: ingredients}})
+      .distinct
+      .order(:name)
+  }  
 end
 ```
 
@@ -38,4 +45,6 @@ Chef.with_unhealthy_recipes
 # => [#<Chef>, #<Chef>]
 Chef.first.unhealthy_recipes
 # => [#<Recipe>, #<Recipe>]
+Chef.with_recipes_with_ingredients(["sugar", "egg"])
+# => [#<Chef>, #<Chef>]
 ```

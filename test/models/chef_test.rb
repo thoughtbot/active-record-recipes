@@ -200,4 +200,26 @@ class ChefTest < ActiveSupport::TestCase
 
     assert_equal ["Another Chef With Quick Recipes", "Chef With Quick Recipes"], Chef.with_quick_recipes.map(&:name)
   end
+
+  test ".with_recipes_with_ingredients" do
+    chef_one = Chef.create!(name: "Chef One")
+    chef_two = Chef.create!(name: "Chef Two")
+    sugar = Ingredient.create!(name: "Sugar")
+    egg = Ingredient.create!(name: "Egg")
+    flour = Ingredient.create!(name: "Flour")
+    recipe_one = chef_one.recipes.create!(name: "Recipe with Sugar", servings: 1)
+    recipe_two = chef_one.recipes.create!(name: "Recipe With Egg", servings: 1)
+    recipe_three = chef_one.recipes.create!(name: "Recipe With Flour", servings: 1)
+    recipe_four = chef_two.recipes.create!(name: "Recipe with Sugar and Egg", servings: 1)
+    recipe_one.measurements.create!(ingredient: sugar)
+    recipe_two.measurements.create!(ingredient: egg)
+    recipe_three.measurements.create!(ingredient: flour)
+    recipe_four.measurements.create!(ingredient: sugar)
+    recipe_four.measurements.create!(ingredient: egg)
+
+    assert_equal ["Chef One", "Chef Two"], Chef.with_recipes_with_ingredients(["sugar"]).map(&:name)
+    assert_equal ["Chef One", "Chef Two"], Chef.with_recipes_with_ingredients(["sugar", "egg"]).map(&:name)
+    assert_equal ["Chef One"], Chef.with_recipes_with_ingredients(["flour"]).map(&:name)
+    assert_equal ["Chef One", "Chef Two"], Chef.with_recipes_with_ingredients(["sugar", "egg", "flour"]).map(&:name)
+  end
 end
