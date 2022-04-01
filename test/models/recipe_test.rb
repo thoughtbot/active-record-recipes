@@ -62,13 +62,15 @@ class RecipeTest < ActiveSupport::TestCase
   end
 
   test ".per_chef" do
-    chef_one = Chef.create!(id: 1)
-    chef_two = Chef.create!(id: 2)
+    chef_one = Chef.create!(name: "Bob")
+    chef_two = Chef.create!(name: "Alice")
+    chef_three = Chef.create!(name: "Ali")
     chef_one.recipes.create!(servings: 1)
     chef_one.recipes.create!(servings: 1)
     chef_two.recipes.create!(servings: 1)
+    chef_three.recipes.create!(servings: 1)
 
-    assert_equal({1 => 2, 2 => 1}, Recipe.per_chef)
+    assert_equal({"Bob" => 2, "Ali" => 1, "Alice" => 1}, Recipe.per_chef)
   end
 
   test ".with_description" do

@@ -19,10 +19,6 @@ class Recipe < ApplicationRecord
       .order(:chef_id, created_at: :desc)
   }
 
-  scope :per_chef, -> {
-    group(:chef_id).count
-  }
-
   scope :with_description, ->(string = "") {
     joins(:rich_text_description).where("body LIKE ?", "%#{string}%")
   }
@@ -51,4 +47,12 @@ class Recipe < ApplicationRecord
       .order(:name)
       .distinct
   }
+
+  def self.per_chef
+    Chef
+      .joins(:recipes)
+      .group(:name)
+      .order("COUNT(recipes.chef_id) DESC, chefs.name ASC")
+      .count
+  end
 end
