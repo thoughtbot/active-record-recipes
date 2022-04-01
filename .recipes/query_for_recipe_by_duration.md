@@ -6,7 +6,10 @@ class Recipe < ApplicationRecord
   has_many :steps
 
   scope :by_duration, -> {
-    joins(:steps).group(:id).sum(:duration)
+    joins(:steps)
+      .group(:name)
+      .order("SUM(steps.duration) ASC")
+      .sum(:duration)
   }
 
   scope :quick, -> {
@@ -17,7 +20,7 @@ end
 
 ```ruby
 Recipe.by_duration
-# => {13=>25 minutes, 14=>5 minutes}
+# => {"Recipe Two"=>5 minutes, "Recipe One"=>25 minutes}
 Recipe.quick
 # => [#<Recipe>, #<Recipe>]
 ```
