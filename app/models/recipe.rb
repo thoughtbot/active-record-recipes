@@ -19,7 +19,7 @@ class Recipe < ApplicationRecord
       .order(:chef_id, created_at: :desc)
   }
 
-  scope :with_description, ->(string = "") {
+  scope :with_description_containing, ->(string) {
     joins(:rich_text_description).where("body LIKE ?", "%#{string}%")
   }
 

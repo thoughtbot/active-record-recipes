@@ -73,15 +73,15 @@ class RecipeTest < ActiveSupport::TestCase
     assert_equal({"Bob" => 2, "Ali" => 1, "Alice" => 1}, Recipe.per_chef)
   end
 
-  test ".with_description" do
+  test ".with_description_containing" do
     chef = Chef.create!(name: "Name")
     chef.recipes.create!(id: 1, servings: 1, description: "he is here")
     chef.recipes.create!(id: 2, servings: 1, description: "hello world")
     chef.recipes.create!(id: 3, servings: 1)
 
-    assert_equal [1, 2], Recipe.with_description.map(&:id)
-    assert_equal [1, 2], Recipe.with_description("he").map(&:id)
-    assert_equal [2], Recipe.with_description("hello").map(&:id)
+    assert_equal [1, 2], Recipe.with_description_containing("").map(&:id)
+    assert_equal [1, 2], Recipe.with_description_containing("he").map(&:id)
+    assert_equal [2], Recipe.with_description_containing("hello").map(&:id)
   end
 
   test ".by_duration" do
