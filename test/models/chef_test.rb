@@ -2,13 +2,13 @@ require "test_helper"
 
 class ChefTest < ActiveSupport::TestCase
   test "should be valid" do
-    chef = Chef.new
+    chef = Chef.new(name: "Name")
 
     assert chef.valid?
   end
 
   test "association with recipe" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
 
     assert_difference("chef.recipes.count", 1) do
       chef.recipes.create!(servings: 1)
@@ -17,6 +17,19 @@ class ChefTest < ActiveSupport::TestCase
     assert_difference("chef.recipes.count", -1) do
       chef.destroy!
     end
+  end
+
+  test "should have name" do
+    chef = Chef.new
+
+    assert_not chef.valid?
+  end
+
+  test "name should be unique" do
+    Chef.create!(name: "Name")
+    chef = Chef.new(name: "Name")
+
+    assert_not chef.valid?
   end
 
   test "#unhealthy_recipes" do
@@ -37,7 +50,7 @@ class ChefTest < ActiveSupport::TestCase
   end
 
   test "#quick_recipes" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     chef.recipes.create!(
       name: "Quick",
       servings: 1,
@@ -75,7 +88,7 @@ class ChefTest < ActiveSupport::TestCase
   end
 
   test ".first_recipe" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     chef.recipes.create!(name: "Latest Recipe", servings: 1, created_at: 1.day.ago)
     chef.recipes.create!(name: "First Recipe", servings: 1, created_at: 1.week.ago)
 
@@ -83,7 +96,7 @@ class ChefTest < ActiveSupport::TestCase
   end
 
   test ".latest_recipe" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     chef.recipes.create!(name: "Latest Recipe", servings: 1, created_at: 1.day.ago)
     chef.recipes.create!(name: "First Recipe", servings: 1, created_at: 1.week.ago)
 

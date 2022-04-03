@@ -2,7 +2,7 @@ require "test_helper"
 
 class RecipeTest < ActiveSupport::TestCase
   test "should be valid" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     recipe = chef.recipes.new(servings: 1)
 
     assert recipe.valid?
@@ -10,7 +10,7 @@ class RecipeTest < ActiveSupport::TestCase
 
   test "#ingredients" do
     ingredient = Ingredient.create!
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     recipe = chef.recipes.create!(servings: 1)
     ingredient.measurements.create!(recipe: recipe)
 
@@ -19,7 +19,7 @@ class RecipeTest < ActiveSupport::TestCase
 
   test "#measurements" do
     ingredient = Ingredient.create!
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     recipe = chef.recipes.create!(servings: 1)
 
     assert_difference("Measurement.count", 1) do
@@ -32,7 +32,7 @@ class RecipeTest < ActiveSupport::TestCase
   end
 
   test "#description" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
 
     assert_difference("ActionText::RichText.count", 1) do
       chef.recipes.create!(description: "some description", servings: 1)
@@ -40,8 +40,8 @@ class RecipeTest < ActiveSupport::TestCase
   end
 
   test ".latest_per_chef" do
-    chef_one = Chef.create!
-    chef_two = Chef.create!
+    chef_one = Chef.create!(name: "Chef One")
+    chef_two = Chef.create!(name: "Chef Two")
     chef_one.recipes.create!(name: "Latest Recipe For Chef One", servings: 1, created_at: 1.hour.ago)
     chef_one.recipes.create!(name: "First Recipe For Chef One", servings: 1, created_at: 1.day.ago)
     chef_two.recipes.create!(name: "Latest Recipe For Chef Two", servings: 1, created_at: 1.hour.ago)
@@ -51,8 +51,8 @@ class RecipeTest < ActiveSupport::TestCase
   end
 
   test ".first_per_chef" do
-    chef_one = Chef.create!
-    chef_two = Chef.create!
+    chef_one = Chef.create!(name: "Chef One")
+    chef_two = Chef.create!(name: "Chef Two")
     chef_one.recipes.create!(name: "Latest Recipe For Chef One", servings: 1, created_at: 1.hour.ago)
     chef_one.recipes.create!(name: "First Recipe For Chef One", servings: 1, created_at: 1.day.ago)
     chef_two.recipes.create!(name: "Latest Recipe For Chef Two", servings: 1, created_at: 1.hour.ago)
@@ -74,7 +74,7 @@ class RecipeTest < ActiveSupport::TestCase
   end
 
   test ".with_description" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     chef.recipes.create!(id: 1, servings: 1, description: "he is here")
     chef.recipes.create!(id: 2, servings: 1, description: "hello world")
     chef.recipes.create!(id: 3, servings: 1)
@@ -85,7 +85,7 @@ class RecipeTest < ActiveSupport::TestCase
   end
 
   test ".by_duration" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     chef.recipes.create!(
       name: "Recipe One",
       servings: 1,
@@ -118,7 +118,7 @@ class RecipeTest < ActiveSupport::TestCase
   end
 
   test ".quick" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     chef.recipes.create!(
       name: "Quick",
       servings: 1,
@@ -156,7 +156,7 @@ class RecipeTest < ActiveSupport::TestCase
   end
 
   test ".unhealthy" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     sugar = Ingredient.create!(name: "Sugar")
     egg = Ingredient.create!(name: "Egg")
     recipe_one = chef.recipes.create!(name: "Unhealthy Recipe", servings: 2)
@@ -171,7 +171,7 @@ class RecipeTest < ActiveSupport::TestCase
   end
 
   test ".with_ingredients" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     sugar = Ingredient.create!(name: "Sugar")
     egg = Ingredient.create!(name: "Egg")
     flour = Ingredient.create!(name: "Flour")
