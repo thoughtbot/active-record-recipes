@@ -10,6 +10,8 @@ A repository of common (and not so common) active record queries.
 - [Query for Recipe by Ingredient](.recipes/query_for_recipe_by_ingredient.md)
 - [Query for Popular Ingredients](.recipes/query_for_popular_ingredients.md)
 - [Query for Chefs by Recipe Ingredient](.recipes/query_for_chefs_with_by_recipe_ingredient.md)
+- [Query for Recipe by Rating](.recipes/query-for-recipe-by-rating.md)
+- [Query for Chef by Recipe by Rating](.recipes/query-for-chef-by-recipe-by-rating.md)
 
 ## 🙏 Contributing
 

@@ -11,7 +11,7 @@ class ChefTest < ActiveSupport::TestCase
     chef = Chef.create!(name: "Name")
 
     assert_difference("chef.recipes.count", 1) do
-      chef.recipes.create!(servings: 1)
+      chef.recipes.create!(name: "Recipe", servings: 1)
     end
 
     assert_difference("chef.recipes.count", -1) do
@@ -234,5 +234,33 @@ class ChefTest < ActiveSupport::TestCase
     assert_equal ["Chef One", "Chef Two"], Chef.with_recipes_with_ingredients(["sugar", "egg"]).map(&:name)
     assert_equal ["Chef One"], Chef.with_recipes_with_ingredients(["flour"]).map(&:name)
     assert_equal ["Chef One", "Chef Two"], Chef.with_recipes_with_ingredients(["sugar", "egg", "flour"]).map(&:name)
+  end
+
+  test ".with_recipes_with_average_rating_above" do
+    chef_with_high_ratings = Chef.create!(name: "Chef With High Ratings")
+    chef_with_average_ratings = Chef.create!(name: "Chef With Average Ratings")
+    recipe_with_high_ratings = chef_with_high_ratings.recipes.create!(
+      name: "Recipe With High Ratings",
+      servings: 1
+    )
+    recipe_with_average_ratings = chef_with_average_ratings.recipes.create!(
+      name: "Recipe With Average Ratings",
+      servings: 1
+    )
+    recipe_with_high_ratings.reviews.create!(rating: 5)
+    recipe_with_high_ratings.reviews.create!(rating: 4)
+    recipe_with_average_ratings.reviews.create!(rating: 3)
+    recipe_with_average_ratings.reviews.create!(rating: 3)
+    recipe_with_average_ratings.reviews.create!(rating: 2)
+    recipe_with_average_ratings.reviews.create!(rating: 2)
+
+    assert_equal(
+      ["Chef With High Ratings"],
+      Chef.with_recipes_with_average_rating_above(4.4).map(&:name)
+    )
+    assert_equal(
+      ["Chef With Average Ratings", "Chef With High Ratings"],
+      Chef.with_recipes_with_average_rating_above(2.4).map(&:name)
+    )
   end
 end

@@ -29,4 +29,11 @@ class Chef < ApplicationRecord
       .distinct
       .order(:name)
   }
+
+  scope :with_recipes_with_average_rating_above, ->(rating) {
+    joins(recipes: :reviews)
+      .where(recipes: Recipe.with_average_rating_above(rating))
+      .distinct
+      .order(:name)
+  }
 end
