@@ -3,15 +3,32 @@ require "test_helper"
 class RecipeTest < ActiveSupport::TestCase
   test "should be valid" do
     chef = Chef.create!(name: "Name")
-    recipe = chef.recipes.new(servings: 1)
+    recipe = chef.recipes.new(name: "Recipe", servings: 1)
 
     assert recipe.valid?
+  end
+
+  test "should have name" do
+    chef = Chef.create!(name: "Chef")
+    recipe = chef.recipes.new(name: nil, servings: 1)
+
+    assert_not recipe.valid?
+  end
+
+  test "name should be unique per chef" do
+    chef_one = Chef.create!(name: "Chef One")
+    chef_two = Chef.create!(name: "Chef Two")
+    chef_one.recipes.create!(name: "Recipe", servings: 1)
+    chef_two.recipes.create!(name: "Recipe", servings: 1)
+    recipe = chef_one.recipes.new(name: "Recipe", servings: 1)
+
+    assert_not recipe.valid?
   end
 
   test "#ingredients" do
     ingredient = Ingredient.create!
     chef = Chef.create!(name: "Name")
-    recipe = chef.recipes.create!(servings: 1)
+    recipe = chef.recipes.create!(name: "Recipe", servings: 1)
     ingredient.measurements.create!(recipe: recipe)
 
     assert_includes recipe.ingredients, ingredient
@@ -20,7 +37,7 @@ class RecipeTest < ActiveSupport::TestCase
   test "#measurements" do
     ingredient = Ingredient.create!
     chef = Chef.create!(name: "Name")
-    recipe = chef.recipes.create!(servings: 1)
+    recipe = chef.recipes.create!(name: "Recipe", servings: 1)
 
     assert_difference("Measurement.count", 1) do
       ingredient.measurements.create!(recipe: recipe)
@@ -35,7 +52,7 @@ class RecipeTest < ActiveSupport::TestCase
     chef = Chef.create!(name: "Name")
 
     assert_difference("ActionText::RichText.count", 1) do
-      chef.recipes.create!(description: "some description", servings: 1)
+      chef.recipes.create!(name: "Recipe", description: "some description", servings: 1)
     end
   end
 
@@ -65,23 +82,23 @@ class RecipeTest < ActiveSupport::TestCase
     chef_one = Chef.create!(name: "Bob")
     chef_two = Chef.create!(name: "Alice")
     chef_three = Chef.create!(name: "Ali")
-    chef_one.recipes.create!(servings: 1)
-    chef_one.recipes.create!(servings: 1)
-    chef_two.recipes.create!(servings: 1)
-    chef_three.recipes.create!(servings: 1)
+    chef_one.recipes.create!(name: "Recipe One", servings: 1)
+    chef_one.recipes.create!(name: "Recipe Two", servings: 1)
+    chef_two.recipes.create!(name: "Recipe Three", servings: 1)
+    chef_three.recipes.create!(name: "Recipe Four", servings: 1)
 
     assert_equal({"Bob" => 2, "Ali" => 1, "Alice" => 1}, Recipe.per_chef)
   end
 
   test ".with_description_containing" do
     chef = Chef.create!(name: "Name")
-    chef.recipes.create!(id: 1, servings: 1, description: "he is here")
-    chef.recipes.create!(id: 2, servings: 1, description: "hello world")
-    chef.recipes.create!(id: 3, servings: 1)
+    chef.recipes.create!(name: "Recipe One", servings: 1, description: "he is here")
+    chef.recipes.create!(name: "Recipe Two", servings: 1, description: "hello world")
+    chef.recipes.create!(name: "Recipe Three", servings: 1)
 
-    assert_equal [1, 2], Recipe.with_description_containing("").map(&:id)
-    assert_equal [1, 2], Recipe.with_description_containing("he").map(&:id)
-    assert_equal [2], Recipe.with_description_containing("hello").map(&:id)
+    assert_equal ["Recipe One", "Recipe Two"], Recipe.with_description_containing("").map(&:name)
+    assert_equal ["Recipe One", "Recipe Two"], Recipe.with_description_containing("he").map(&:name)
+    assert_equal ["Recipe Two"], Recipe.with_description_containing("hello").map(&:name)
   end
 
   test ".by_duration" do
@@ -186,5 +203,52 @@ class RecipeTest < ActiveSupport::TestCase
     recipe_four.measurements.create!(ingredient: egg)
 
     assert_equal ["Recipe With Egg", "Recipe with Sugar", "Recipe with Sugar and Egg"], Recipe.with_ingredients(["sugar", "egg"]).map(&:name)
+  end
+
+  test ".by_average_rating" do
+    chef_one = Chef.create!(name: "Chef One")
+    chef_two = Chef.create!(name: "Chef Two")
+    highly_rated_recipe_chef_one = chef_one.recipes.create!(name: "Highly Rated Recipe", servings: 1)
+    poorly_rated_recipe_chef_one = chef_one.recipes.create!(name: "Poorly Rated Recipe", servings: 1)
+    highly_rated_recipe_chef_two = chef_two.recipes.create!(name: "Highly Rated Recipe", servings: 1)
+    chef_one.recipes.create!(name: "Without Reviews", servings: 1)
+    highly_rated_recipe_chef_one.reviews.create!(rating: 5)
+    highly_rated_recipe_chef_one.reviews.create!(rating: 4)
+    highly_rated_recipe_chef_two.reviews.create!(rating: 5)
+    poorly_rated_recipe_chef_one.reviews.create!(rating: 1)
+    poorly_rated_recipe_chef_one.reviews.create!(rating: 2)
+
+    assert_equal(
+      {
+        ["Highly Rated Recipe", "Chef Two"] => 5,
+        ["Highly Rated Recipe", "Chef One"] => 4.5,
+        ["Poorly Rated Recipe", "Chef One"] => 1.5
+      },
+      Recipe.by_average_rating
+    )
+    assert_equal([["Highly Rated Recipe", "Chef Two"], 5], Recipe.by_average_rating.first)
+  end
+
+  test ".with_average_rating_above" do
+    chef_one = Chef.create!(name: "Chef One")
+    chef_two = Chef.create!(name: "Chef Two")
+    highly_rated_recipe_chef_one = chef_one.recipes.create!(name: "Highly Rated Recipe", servings: 1)
+    poorly_rated_recipe_chef_one = chef_one.recipes.create!(name: "Poorly Rated Recipe", servings: 1)
+    highly_rated_recipe_chef_two = chef_two.recipes.create!(name: "Highly Rated Recipe", servings: 1)
+    chef_one.recipes.create!(name: "Without Reviews", servings: 1)
+    highly_rated_recipe_chef_one.reviews.create!(rating: 5)
+    highly_rated_recipe_chef_one.reviews.create!(rating: 4)
+    highly_rated_recipe_chef_two.reviews.create!(rating: 5)
+    poorly_rated_recipe_chef_one.reviews.create!(rating: 1)
+    poorly_rated_recipe_chef_one.reviews.create!(rating: 2)
+
+    assert_equal(
+      ["Highly Rated Recipe (Chef Two)", "Highly Rated Recipe (Chef One)"],
+      Recipe.with_average_rating_above(4.4).map { |recipe| "#{recipe.name} (#{recipe.chef.name})" }
+    )
+    assert_equal(
+      ["Highly Rated Recipe (Chef Two)", "Highly Rated Recipe (Chef One)", "Poorly Rated Recipe (Chef One)"],
+      Recipe.with_average_rating_above(1.4).map { |recipe| "#{recipe.name} (#{recipe.chef.name})" }
+    )
   end
 end

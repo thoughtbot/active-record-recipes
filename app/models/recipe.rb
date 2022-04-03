@@ -3,11 +3,13 @@ class Recipe < ApplicationRecord
   has_many :steps
   has_many :measurements, dependent: :destroy
   has_many :ingredients, through: :measurements
+  has_many :reviews, dependent: :destroy
   accepts_nested_attributes_for :steps
 
   has_rich_text :description
 
-  validates :servings, presence: true
+  validates :name, :servings, presence: true
+  validates :name, uniqueness: {scope: :chef}
 
   scope :first_per_chef, -> {
     select("DISTINCT ON(recipes.chef_id) recipes.*")
@@ -41,6 +43,13 @@ class Recipe < ApplicationRecord
       .distinct
   }
 
+  scope :with_average_rating_above, ->(rating) {
+    joins(:reviews)
+      .group(:id)
+      .having("AVG(reviews.rating) > ?", rating)
+      .order("AVG(reviews.rating) DESC")
+  }
+
   def self.by_duration
     joins(:steps)
       .group(:name)
@@ -54,5 +63,12 @@ class Recipe < ApplicationRecord
       .group(:name)
       .order("COUNT(recipes.chef_id) DESC, chefs.name ASC")
       .count
+  end
+
+  def self.by_average_rating
+    joins(:reviews, :chef)
+      .group("recipes.name", "chefs.name")
+      .order("AVG(reviews.rating) DESC, recipes.name ASC")
+      .average(:rating)
   end
 end
