@@ -23,7 +23,7 @@ class IngredientTest < ActiveSupport::TestCase
 
   test "#measurements" do
     ingredient = Ingredient.create!
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     recipe = chef.recipes.create!(servings: 1)
 
     assert_difference("Measurement.count", 1) do
@@ -36,7 +36,7 @@ class IngredientTest < ActiveSupport::TestCase
   end
 
   test ".popular" do
-    chef = Chef.create!
+    chef = Chef.create!(name: "Name")
     sugar = Ingredient.create!(name: "Sugar")
     egg = Ingredient.create!(name: "Egg")
     flour = Ingredient.create!(name: "Flour")

@@ -6,6 +6,9 @@ class Chef < ApplicationRecord
   has_one :first_recipe, -> { order(created_at: :asc) }, class_name: "Recipe"
   has_one :latest_recipe, class_name: "Recipe"
 
+  validates :name, presence: true
+  validates :name, uniqueness: true
+
   scope :with_unhealthy_recipes, -> {
     joins(:recipes)
       .where(recipes: Recipe.unhealthy)
