@@ -1,6 +1,6 @@
 class Chef < ApplicationRecord
   has_many :recipes, dependent: :destroy
-  has_many :unhealthy_recipes, -> { unhealthy }, class_name: "Recipe"
+  has_many :sweet_recipes, -> { sweet }, class_name: "Recipe"
   has_many :quick_recipes, -> { quick }, class_name: "Recipe"
 
   has_one :first_recipe, -> { order(created_at: :asc) }, class_name: "Recipe"
@@ -9,9 +9,9 @@ class Chef < ApplicationRecord
   validates :name, presence: true
   validates :name, uniqueness: true
 
-  scope :with_unhealthy_recipes, -> {
+  scope :with_sweet_recipes, -> {
     joins(:recipes)
-      .where(recipes: Recipe.unhealthy)
+      .where(recipes: Recipe.sweet)
       .order(:name)
       .distinct
   }

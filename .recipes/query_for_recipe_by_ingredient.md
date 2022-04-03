@@ -8,7 +8,7 @@ class Recipe < ApplicationRecord
 
   validates :servings, presence: true
 
-  scope :unhealthy, -> {
+  scope :sweet, -> {
     joins(:ingredients)
       .where({ingredients: {name: "sugar"}})
       .group(:id)
@@ -25,7 +25,7 @@ end
 ```
 
 ```ruby
-Recipe.unhealthy
+Recipe.sweet
 # => [#<Recipe>, #<Recipe>]
 Recipe.with_ingredients(["sugar", "flower"])
 # => [#<Recipe>, #<Recipe>]

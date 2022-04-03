@@ -155,19 +155,19 @@ class RecipeTest < ActiveSupport::TestCase
     assert_equal ["Quick"], Recipe.quick.map(&:name)
   end
 
-  test ".unhealthy" do
+  test ".sweet" do
     chef = Chef.create!(name: "Name")
     sugar = Ingredient.create!(name: "Sugar")
     egg = Ingredient.create!(name: "Egg")
-    recipe_one = chef.recipes.create!(name: "Unhealthy Recipe", servings: 2)
+    recipe_one = chef.recipes.create!(name: "Sweet Recipe", servings: 2)
     recipe_two = chef.recipes.create!(name: "Healthy Recipe", servings: 1)
-    recipe_three = chef.recipes.create!(name: "Slightly Unhealthy Recipe", servings: 1)
+    recipe_three = chef.recipes.create!(name: "Slightly Sweet Recipe", servings: 1)
     recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
     recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
     recipe_two.measurements.create!(ingredient: egg)
     recipe_three.measurements.create!(ingredient: sugar, grams: 10.00)
 
-    assert_equal ["Unhealthy Recipe"], Recipe.unhealthy.map(&:name)
+    assert_equal ["Sweet Recipe"], Recipe.sweet.map(&:name)
   end
 
   test ".with_ingredients" do

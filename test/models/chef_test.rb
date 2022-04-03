@@ -32,21 +32,21 @@ class ChefTest < ActiveSupport::TestCase
     assert_not chef.valid?
   end
 
-  test "#unhealthy_recipes" do
-    chef_one = Chef.create!(name: "Unhealthy")
+  test "#sweet_recipes" do
+    chef_one = Chef.create!(name: "Sweet")
     chef_two = Chef.create!(name: "Healthy")
     sugar = Ingredient.create!(name: "Sugar")
     egg = Ingredient.create!(name: "Egg")
-    recipe_one = chef_one.recipes.create!(name: "Unhealthy Recipe", servings: 2)
+    recipe_one = chef_one.recipes.create!(name: "Sweet Recipe", servings: 2)
     recipe_two = chef_two.recipes.create!(name: "Healthy Recipe", servings: 1)
-    recipe_three = chef_one.recipes.create!(name: "Slightly Unhealthy Recipe", servings: 1)
+    recipe_three = chef_one.recipes.create!(name: "Slightly Sweet Recipe", servings: 1)
     recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
     recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
     recipe_two.measurements.create!(ingredient: egg)
     recipe_three.measurements.create!(ingredient: sugar, grams: 10.00)
 
-    assert_equal ["Unhealthy Recipe"], chef_one.unhealthy_recipes.map(&:name)
-    assert_empty chef_two.unhealthy_recipes.map(&:name)
+    assert_equal ["Sweet Recipe"], chef_one.sweet_recipes.map(&:name)
+    assert_empty chef_two.sweet_recipes.map(&:name)
   end
 
   test "#quick_recipes" do
@@ -103,17 +103,17 @@ class ChefTest < ActiveSupport::TestCase
     assert_equal "Latest Recipe", chef.latest_recipe.name
   end
 
-  test ".with_unhealthy_recipes" do
-    chef_one = Chef.create!(name: "Chef With Unhealthy Recipes")
+  test ".with_sweet_recipes" do
+    chef_one = Chef.create!(name: "Chef With Sweet Recipes")
     chef_two = Chef.create!(name: "Chef Wit Healthy Recipes")
-    chef_three = Chef.create!(name: "Another Chef With Unhealthy Recipes")
+    chef_three = Chef.create!(name: "Another Chef With Sweet Recipes")
     sugar = Ingredient.create!(name: "Sugar")
     egg = Ingredient.create!(name: "Egg")
-    recipe_one = chef_one.recipes.create!(name: "Unhealthy Recipe", servings: 2)
+    recipe_one = chef_one.recipes.create!(name: "Sweet Recipe", servings: 2)
     recipe_two = chef_two.recipes.create!(name: "Healthy Recipe", servings: 1)
-    recipe_three = chef_one.recipes.create!(name: "Slightly Unhealthy Recipe", servings: 1)
-    recipe_four = chef_three.recipes.create!(name: "Another Slightly Unhealthy Recipe", servings: 1)
-    recipe_five = chef_three.recipes.create!(name: "Another Unhealthy Recipe", servings: 1)
+    recipe_three = chef_one.recipes.create!(name: "Slightly Sweet Recipe", servings: 1)
+    recipe_four = chef_three.recipes.create!(name: "Another Slightly Sweet Recipe", servings: 1)
+    recipe_five = chef_three.recipes.create!(name: "Another Sweet Recipe", servings: 1)
     recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
     recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
     recipe_two.measurements.create!(ingredient: egg)
@@ -121,7 +121,7 @@ class ChefTest < ActiveSupport::TestCase
     recipe_four.measurements.create!(ingredient: sugar, grams: 20.00)
     recipe_five.measurements.create!(ingredient: sugar, grams: 20.00)
 
-    assert_equal ["Another Chef With Unhealthy Recipes", "Chef With Unhealthy Recipes"], Chef.with_unhealthy_recipes.map(&:name)
+    assert_equal ["Another Chef With Sweet Recipes", "Chef With Sweet Recipes"], Chef.with_sweet_recipes.map(&:name)
   end
 
   test ".with_quick_recipes" do
