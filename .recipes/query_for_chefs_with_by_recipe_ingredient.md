@@ -9,7 +9,7 @@ class Recipe < ApplicationRecord
 
   validates :servings, presence: true
 
-  scope :unhealthy, -> {
+  scope :sweet, -> {
     joins(:ingredients)
       .where({ingredients: {name: "sugar"}})
       .group(:id)
@@ -22,11 +22,11 @@ end
 # app/models/chef.rb
 class Chef < ApplicationRecord
   has_many :recipes, dependent: :destroy
-  has_many :unhealthy_recipes, -> { unhealthy }, class_name: "Recipe"
+  has_many :sweet_recipes, -> { sweet }, class_name: "Recipe"
 
-  scope :with_unhealthy_recipes, -> {
+  scope :with_sweet_recipes, -> {
     joins(:recipes)
-      .where(recipes: Recipe.unhealthy)
+      .where(recipes: Recipe.sweet)
       .order(:name)
       .distinct
   }
@@ -41,9 +41,9 @@ end
 ```
 
 ```ruby
-Chef.with_unhealthy_recipes
+Chef.with_sweet_recipes
 # => [#<Chef>, #<Chef>]
-Chef.first.unhealthy_recipes
+Chef.first.sweet_recipes
 # => [#<Recipe>, #<Recipe>]
 Chef.with_recipes_with_ingredients(["sugar", "egg"])
 # => [#<Chef>, #<Chef>]

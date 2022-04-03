@@ -27,7 +27,7 @@ class Recipe < ApplicationRecord
     joins(:steps).group(:id).having("SUM(duration) <= ?", 15.minutes.iso8601)
   }
 
-  scope :unhealthy, -> {
+  scope :sweet, -> {
     joins(:ingredients)
       .where({ingredients: {name: "sugar"}})
       .group(:id)
