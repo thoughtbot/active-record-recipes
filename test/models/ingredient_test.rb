@@ -51,5 +51,6 @@ class IngredientTest < ActiveSupport::TestCase
     recipe_four.measurements.create!(ingredient: egg)
 
     assert_equal({"egg" => 2, "sugar" => 2, "flour" => 1}, Ingredient.popular)
+    assert_equal(["egg", 2], Ingredient.popular.first)
   end
 end
