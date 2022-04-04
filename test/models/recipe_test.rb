@@ -88,6 +88,7 @@ class RecipeTest < ActiveSupport::TestCase
     chef_three.recipes.create!(name: "Recipe Four", servings: 1)
 
     assert_equal({"Bob" => 2, "Ali" => 1, "Alice" => 1}, Recipe.per_chef)
+    assert_equal(["Bob", 2], Recipe.per_chef.first)
   end
 
   test ".with_description_containing" do
@@ -132,6 +133,7 @@ class RecipeTest < ActiveSupport::TestCase
     )
 
     assert_equal({"Recipe Two" => 300, "Recipe One" => 1500}, Recipe.by_duration)
+    assert_equal(["Recipe Two", 300], Recipe.by_duration.first)
   end
 
   test ".quick" do
