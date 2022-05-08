@@ -10,14 +10,14 @@ class Chef < ApplicationRecord
   validates :name, uniqueness: true
 
   scope :with_sweet_recipes, -> {
-    joins(:recipes)
+    joins(recipes: [ingredients: :measurements])
       .where(recipes: Recipe.sweet)
       .order(:name)
       .distinct
   }
 
   scope :with_quick_recipes, -> {
-    joins(:recipes)
+    joins(recipes: :steps)
       .where(recipes: Recipe.quick)
       .order(:name)
       .distinct

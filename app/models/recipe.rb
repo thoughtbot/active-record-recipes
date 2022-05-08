@@ -30,10 +30,12 @@ class Recipe < ApplicationRecord
   }
 
   scope :sweet, -> {
-    joins(:ingredients)
+    joins(ingredients: :measurements)
       .where({ingredients: {name: "sugar"}})
       .group(:id)
-      .having("(SUM(grams) / recipes.servings) >= ?", 20.00)
+      .having(
+        "(SUM(DISTINCT measurements.grams) / recipes.servings) >= ?", 20.00
+      )
   }
 
   scope :with_ingredients, ->(ingredients) {
