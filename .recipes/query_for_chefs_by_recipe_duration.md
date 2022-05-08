@@ -19,7 +19,7 @@ class Chef < ApplicationRecord
   has_many :quick_recipes, -> { quick }, class_name: "Recipe"
 
   scope :with_quick_recipes, -> {
-    joins(:recipes)
+    joins(recipes: :steps)
       .where(recipes: Recipe.quick)
       .order(:name)
       .distinct

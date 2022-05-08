@@ -182,7 +182,8 @@ class RecipeTest < ActiveSupport::TestCase
     recipe_two = chef.recipes.create!(name: "Healthy Recipe", servings: 1)
     recipe_three = chef.recipes.create!(name: "Slightly Sweet Recipe", servings: 1)
     recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
-    recipe_one.measurements.create!(ingredient: sugar, grams: 20.00)
+    recipe_one.measurements.create!(ingredient: sugar, grams: 12.00)
+    recipe_one.measurements.create!(ingredient: sugar, grams: 8.00)
     recipe_two.measurements.create!(ingredient: egg)
     recipe_three.measurements.create!(ingredient: sugar, grams: 10.00)
 

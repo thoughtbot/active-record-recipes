@@ -10,10 +10,12 @@ class Recipe < ApplicationRecord
   validates :servings, presence: true
 
   scope :sweet, -> {
-    joins(:ingredients)
+    joins(ingredients: :measurements)
       .where({ingredients: {name: "sugar"}})
       .group(:id)
-      .having("(SUM(grams) / recipes.servings) >= ?", 20.00)
+      .having(
+        "(SUM(DISTINCT measurements.grams) / recipes.servings) >= ?", 20.00
+      )
   }
 end
 ```
@@ -25,7 +27,7 @@ class Chef < ApplicationRecord
   has_many :sweet_recipes, -> { sweet }, class_name: "Recipe"
 
   scope :with_sweet_recipes, -> {
-    joins(:recipes)
+    joins(recipes: [ingredients: :measurements])
       .where(recipes: Recipe.sweet)
       .order(:name)
       .distinct
