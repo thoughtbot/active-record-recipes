@@ -54,7 +54,7 @@ class Recipe < ApplicationRecord
 
   def self.by_duration
     joins(:steps)
-      .group(:name)
+      .group(:name, :chef_id)
       .order("SUM(steps.duration) ASC")
       .sum(:duration)
   end
