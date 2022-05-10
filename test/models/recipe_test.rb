@@ -132,8 +132,8 @@ class RecipeTest < ActiveSupport::TestCase
       ]
     )
 
-    assert_equal({"Recipe Two" => 300, "Recipe One" => 1500}, Recipe.by_duration)
-    assert_equal(["Recipe Two", 300], Recipe.by_duration.first)
+    assert_equal({["Recipe Two", chef.id] => 300, ["Recipe One", chef.id] => 1500}, Recipe.by_duration)
+    assert_equal([["Recipe Two", chef.id], 300], Recipe.by_duration.first)
   end
 
   test ".quick" do
