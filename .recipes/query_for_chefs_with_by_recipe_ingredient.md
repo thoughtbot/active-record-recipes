@@ -9,14 +9,14 @@ class Recipe < ApplicationRecord
 
   validates :servings, presence: true
 
-  scope :sweet, -> {
+  def self.sweet
     joins(ingredients: :measurements)
       .where({ingredients: {name: "sugar"}})
       .group(:id)
       .having(
         "(SUM(DISTINCT measurements.grams) / recipes.servings) >= ?", 20.00
       )
-  }
+  end
 end
 ```
 
@@ -26,19 +26,19 @@ class Chef < ApplicationRecord
   has_many :recipes, dependent: :destroy
   has_many :sweet_recipes, -> { sweet }, class_name: "Recipe"
 
-  scope :with_sweet_recipes, -> {
+  def self.with_sweet_recipes
     joins(recipes: [ingredients: :measurements])
       .where(recipes: Recipe.sweet)
       .order(:name)
       .distinct
-  }
+  end
 
-  scope :with_recipes_with_ingredients, ->(ingredients) {
+  def self.with_recipes_with_ingredients(ingredients)
     joins(recipes: :ingredients)
       .where({ingredients: {name: ingredients}})
       .distinct
       .order(:name)
-  }  
+  end
 end
 ```
 

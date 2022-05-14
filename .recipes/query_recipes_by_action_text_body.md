@@ -5,9 +5,9 @@
 class Recipe < ApplicationRecord
   has_rich_text :description
 
-  scope :with_description_containing, ->(string) {
+  def self.with_description_containing(string)
     joins(:rich_text_description).where("body LIKE ?", "%#{string}%")
-  }
+  end
 end
 ```
 

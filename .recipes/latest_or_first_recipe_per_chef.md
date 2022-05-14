@@ -5,15 +5,15 @@
 class Recipe < ApplicationRecord
   belongs_to :chef
 
-  scope :first_per_chef, -> {
+  def self.first_per_chef
     select("DISTINCT ON(recipes.chef_id) recipes.*")
       .order(:chef_id, created_at: :asc)
-  }
+  end
 
-  scope :latest_per_chef, -> {
+  def self.latest_per_chef
     select("DISTINCT ON(recipes.chef_id) recipes.*")
       .order(:chef_id, created_at: :desc)
-  }
+  end
 end
 ```
 

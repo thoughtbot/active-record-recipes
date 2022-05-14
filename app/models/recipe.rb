@@ -11,46 +11,46 @@ class Recipe < ApplicationRecord
   validates :name, :servings, presence: true
   validates :name, uniqueness: {scope: :chef}
 
-  scope :first_per_chef, -> {
+  def self.first_per_chef
     select("DISTINCT ON(recipes.chef_id) recipes.*")
       .order(:chef_id, created_at: :asc)
-  }
+  end
 
-  scope :latest_per_chef, -> {
+  def self.latest_per_chef
     select("DISTINCT ON(recipes.chef_id) recipes.*")
       .order(:chef_id, created_at: :desc)
-  }
+  end
 
-  scope :with_description_containing, ->(string) {
+  def self.with_description_containing(string)
     joins(:rich_text_description).where("body LIKE ?", "%#{string}%")
-  }
+  end
 
-  scope :quick, -> {
+  def self.quick
     joins(:steps).group(:id).having("SUM(duration) <= ?", 15.minutes.iso8601)
-  }
+  end
 
-  scope :sweet, -> {
+  def self.sweet
     joins(ingredients: :measurements)
       .where({ingredients: {name: "sugar"}})
       .group(:id)
       .having(
         "(SUM(DISTINCT measurements.grams) / recipes.servings) >= ?", 20.00
       )
-  }
+  end
 
-  scope :with_ingredients, ->(ingredients) {
+  def self.with_ingredients(ingredients)
     joins(:ingredients)
       .where({ingredients: {name: ingredients}})
       .order(:name)
       .distinct
-  }
+  end
 
-  scope :with_average_rating_above, ->(rating) {
+  def self.with_average_rating_above(rating)
     joins(:reviews)
       .group(:id)
       .having("AVG(reviews.rating) > ?", rating)
       .order("AVG(reviews.rating) DESC")
-  }
+  end
 
   def self.by_duration
     joins(:steps)

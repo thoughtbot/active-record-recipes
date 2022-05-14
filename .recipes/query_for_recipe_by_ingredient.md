@@ -8,19 +8,19 @@ class Recipe < ApplicationRecord
 
   validates :servings, presence: true
 
-  scope :sweet, -> {
+  def self.sweet
     joins(:ingredients)
       .where({ingredients: {name: "sugar"}})
       .group(:id)
       .having("(SUM(grams) / recipes.servings) >= ?", 20.00)
-  }
+  end
 
-  scope :with_ingredients, ->(ingredients) {
+  def self.with_ingredients(ingredients)
     joins(:ingredients)
       .where({ingredients: {name: ingredients}})
       .order(:name)
       .distinct
-  }
+  end
 end
 ```
 
