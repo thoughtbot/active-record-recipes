@@ -96,10 +96,13 @@ class RecipeTest < ActiveSupport::TestCase
     chef.recipes.create!(name: "Recipe One", servings: 1, description: "he is here")
     chef.recipes.create!(name: "Recipe Two", servings: 1, description: "hello world")
     chef.recipes.create!(name: "Recipe Three", servings: 1)
+    chef.recipes.create!(name: "Recipe Four", servings: 1, description: "Uses 100% grass fed beef")
+    chef.recipes.create!(name: "Recipe Five", servings: 1, description: "100 5 star reviews and counting")
 
-    assert_equal ["Recipe One", "Recipe Two"], Recipe.with_description_containing("").map(&:name)
+    assert_equal ["Recipe One", "Recipe Two", "Recipe Four", "Recipe Five"], Recipe.with_description_containing("").map(&:name)
     assert_equal ["Recipe One", "Recipe Two"], Recipe.with_description_containing("he").map(&:name)
     assert_equal ["Recipe Two"], Recipe.with_description_containing("hello").map(&:name)
+    assert_equal ["Recipe Four"], Recipe.with_description_containing("100%").map(&:name)
   end
 
   test ".by_duration" do

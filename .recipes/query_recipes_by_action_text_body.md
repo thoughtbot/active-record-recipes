@@ -6,7 +6,11 @@ class Recipe < ApplicationRecord
   has_rich_text :description
 
   def self.with_description_containing(string)
-    joins(:rich_text_description).where("body LIKE ?", "%#{string}%")
+    joins(:rich_text_description)
+      .where(
+        "body LIKE ?",
+        "%" + Recipe.sanitize_sql_like(string) + "%"
+      )
   end
 end
 ```
