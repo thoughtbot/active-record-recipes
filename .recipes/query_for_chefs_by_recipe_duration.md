@@ -6,9 +6,9 @@ class Recipe < ApplicationRecord
   belongs_to :chef
   has_many :steps
 
-  scope :quick, -> {
+  def self.quick
     joins(:steps).group(:id).having("SUM(duration) <= ?", 15.minutes.iso8601)
-  }
+  end
 end
 ```
 
@@ -18,12 +18,12 @@ class Chef < ApplicationRecord
   has_many :recipes, dependent: :destroy
   has_many :quick_recipes, -> { quick }, class_name: "Recipe"
 
-  scope :with_quick_recipes, -> {
+  def self.with_quick_recipes
     joins(recipes: :steps)
       .where(recipes: Recipe.quick)
       .order(:name)
       .distinct
-  }
+  end
 end
 
 ```

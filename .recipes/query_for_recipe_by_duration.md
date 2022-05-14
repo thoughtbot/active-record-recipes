@@ -5,7 +5,7 @@
 class Recipe < ApplicationRecord
   has_many :steps
 
-  scope :quick, -> {
+  def self.quick, -> {
     joins(:steps).group(:id).having("SUM(duration) <= ?", 15.minutes.iso8601)
   }
 

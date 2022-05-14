@@ -8,12 +8,12 @@ class Recipe < ApplicationRecord
 
   validates :name, uniqueness: {scope: :chef}
 
-  scope :with_average_rating_above, ->(rating) {
+  def self.with_average_rating_above(rating)
     joins(:reviews)
       .group(:id)
       .having("AVG(reviews.rating) > ?", rating)
       .order("AVG(reviews.rating) DESC")
-  }
+  end
 
   def self.by_average_rating
     joins(:reviews, :chef)

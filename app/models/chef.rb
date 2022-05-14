@@ -9,31 +9,31 @@ class Chef < ApplicationRecord
   validates :name, presence: true
   validates :name, uniqueness: true
 
-  scope :with_sweet_recipes, -> {
+  def self.with_sweet_recipes
     joins(recipes: [ingredients: :measurements])
       .where(recipes: Recipe.sweet)
       .order(:name)
       .distinct
-  }
+  end
 
-  scope :with_quick_recipes, -> {
+  def self.with_quick_recipes
     joins(recipes: :steps)
       .where(recipes: Recipe.quick)
       .order(:name)
       .distinct
-  }
+  end
 
-  scope :with_recipes_with_ingredients, ->(ingredients) {
+  def self.with_recipes_with_ingredients(ingredients)
     joins(recipes: :ingredients)
       .where({ingredients: {name: ingredients}})
       .distinct
       .order(:name)
-  }
+  end
 
-  scope :with_recipes_with_average_rating_above, ->(rating) {
+  def self.with_recipes_with_average_rating_above(rating)
     joins(recipes: :reviews)
       .where(recipes: Recipe.with_average_rating_above(rating))
       .distinct
       .order(:name)
-  }
+  end
 end

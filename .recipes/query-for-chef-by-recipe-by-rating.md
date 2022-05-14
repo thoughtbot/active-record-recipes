@@ -5,12 +5,12 @@
 class Chef < ApplicationRecord
   has_many :recipes, dependent: :destroy
 
-  scope :with_recipes_with_average_rating_above, ->(rating) {
+  def self.with_recipes_with_average_rating_above(rating)
     joins(recipes: :reviews)
       .where(recipes: Recipe.with_average_rating_above(rating))
       .distinct
       .order(:name)
-  }
+  end
 end
 ```
 
@@ -22,12 +22,12 @@ class Recipe < ApplicationRecord
 
   validates :name, uniqueness: {scope: :chef}
 
-  scope :with_average_rating_above, ->(rating) {
+  def self.with_average_rating_above(rating)
     joins(:reviews)
       .group(:id)
       .having("AVG(reviews.rating) > ?", rating)
       .order("AVG(reviews.rating) DESC")
-  }
+  end
 end
 ```
 
